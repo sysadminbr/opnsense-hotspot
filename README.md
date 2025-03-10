@@ -128,7 +128,7 @@ server {
 
 ### baixar os arquivos do portal web
 ```
-git clone https://github.com/CitraIT/opnsense-hotspot
+git clone https://github.com/sysadminbr/opnsense-hotspot
 sudo mv opnsense-hotspot/radius_server/var/www/html/* /var/www/html/
 sudo chown -R www-data:www-data /var/www/html/
 ```
