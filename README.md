@@ -178,7 +178,7 @@ sudo certbot -d auth.sysadminbr.com.br
    - **RADIUS Server**: IP do Servidor RADIUS
    - **Shared Secret**: CHAVE_SECRETA
 6. Modifique o **Template do Portal** do OPNsense
-   - Faça o download do template na tela de modelos.
+   - Faça o download do template modelo da tela **Services → Captive Portal → Administration → Templates**.
    - Extraia o arquivo .zip
    - Substitua o arquivo index.html pelo fornecido neste projeto (arquivo templates/index.html)
    - Edite o arquivo index.html e substitua o endereço do servidor radius/web.  
