@@ -177,7 +177,15 @@ sudo certbot -d auth.sysadminbr.com.br
    - **Authentication**: RADIUS-HOTSPOT
    - **RADIUS Server**: IP do Servidor RADIUS
    - **Shared Secret**: CHAVE_SECRETA
-6. Adicione regras de firewall para permitir tráfego autenticado
+6. Modifique o **Template do Portal** do OPNsense
+   - Faça o download do template na tela de modelos.
+   - Extraia o arquivo .zip
+   - Substitua o arquivo index.html pelo fornecido neste projeto (arquivo templates/index.html)
+   - Edite o arquivo index.html e substitua o endereço do servidor radius/web.  
+   ```let target_server = 'http://192.168.100.185';```
+   - Zipe a pasta do modelo e faça upload para o opnsense.
+   - Edite a zona e selecione o novo template.
+7. Adicione regras de firewall para permitir tráfego autenticado
 
 <br/> 
 
@@ -204,7 +212,7 @@ No OPNsense, configure **Traffic Shaping** para controlar o uso da rede por grup
 ## ❗ **Segurança e Boas Práticas**
 ✅ **Use HTTPS no portal** (Let's Encrypt + Certbot)  
 ✅ **Aplique regras de firewall restritivas** para isolar clientes  
-✅ **Use logs para auditoria** de acessos ao hotspot  
+✅ **Use logs para auditoria** de acessos do wi-fi  
 ✅ **Mantenha os softwares atualizados** para evitar vulnerabilidades  
 
 
