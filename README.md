@@ -88,12 +88,79 @@ sudo mysql -u root -p -e "use radius; show tables"
 ### habilitar o módulo sql
 ```
 sudo ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/
-vi /etc/freeradius/3.0/mods-enabled/sql
-sudo chgrp -h freerad /etc/freeradius/3.0/mods-available/sql
-sudo chown -R freerad:freerad /etc/freeradius/3.0/mods-enabled/sql
-sudo systemctl restart freeradius
 ```
 
+Execute o comando abaixo para configurar o módulo sql que faz ponte com o banco MySQL
+```
+cat << "EOF" > /etc/freeradius/3.0/mods-enabled/sql
+sql {
+        dialect = "mysql"
+        driver = "rlm_sql_${dialect}"
+        sqlite {
+                filename = "/tmp/freeradius.db"
+                busy_timeout = 200
+                bootstrap = "${modconfdir}/${..:name}/main/sqlite/schema.sql"
+        }
+        mysql {
+                warnings = auto
+        }
+        postgresql {
+                send_application_name = yes
+        }
+        mongo {
+                appname = "freeradius"
+                tls {
+                        certificate_file = /path/to/file
+                        certificate_password = "password"
+                        ca_file = /path/to/file
+                        ca_dir = /path/to/directory
+                        crl_file = /path/to/file
+                        weak_cert_validation = false
+                        allow_invalid_hostname = false
+                }
+        }
+        server = "localhost"
+        port = 3306
+        login = "radius"
+        password = "radius"
+        radius_db = "radius"
+        acct_table1 = "radacct"
+        acct_table2 = "radacct"
+        postauth_table = "radpostauth"
+        authcheck_table = "radcheck"
+        groupcheck_table = "radgroupcheck"
+        authreply_table = "radreply"
+        groupreply_table = "radgroupreply"
+        usergroup_table = "radusergroup"
+        delete_stale_sessions = yes
+        pool {
+                start = ${thread[pool].start_servers}
+                min = ${thread[pool].min_spare_servers}
+                max = ${thread[pool].max_servers}
+                spare = ${thread[pool].max_spare_servers}
+                uses = 0
+                retry_delay = 30
+                lifetime = 0
+                idle_timeout = 60
+                max_retries = 5
+        }
+        client_table = "nas"
+        group_attribute = "SQL-Group"
+        $INCLUDE ${modconfdir}/${.:name}/main/${dialect}/queries.conf
+}
+EOF
+```
+
+Ajuste as permissões dos arquivos  
+```
+sudo chgrp -h freerad /etc/freeradius/3.0/mods-available/sql
+sudo chown -R freerad:freerad /etc/freeradius/3.0/mods-enabled/sql
+```
+
+Reinicie o serviço do freeradius
+```
+sudo systemctl restart freeradius
+```
 
 
 
