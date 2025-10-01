@@ -100,13 +100,13 @@ sudo systemctl restart freeradius
 ### **2️⃣ Configurar o Portal Web**
 ### instalar o nginx e php
 ```
-sudo apt install -y nginx php8.1-fpm php-mysql
+sudo apt install -y nginx php8.3-fpm php-mysql
 ```
 
 
 ### Configura o nginx para buscar o php
 ```
-# vi /etc/nginx/sites-enabled/default
+cat << "EOF"> /etc/nginx/sites-enabled/default
 server {
         listen 80 default_server;
         listen [::]:80 default_server;
@@ -119,15 +119,16 @@ server {
         }
         location ~ \.php$ {
                 include fastcgi.conf;
-                fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+                fastcgi_pass unix:/run/php/php-fpm.sock;
         }
 }
-
+EOF
 ```
 
 
 ### baixar os arquivos do portal web
 ```
+cd $HOME
 git clone https://github.com/sysadminbr/opnsense-hotspot
 sudo mv opnsense-hotspot/radius_server/var/www/html/* /var/www/html/
 sudo chown -R www-data:www-data /var/www/html/
@@ -136,7 +137,7 @@ sudo chown -R www-data:www-data /var/www/html/
 
 ### configurar o timezone do php
 ```
-# sudo vim /etc/php/8.1/fpm/php.ini
+# sudo vim /etc/php/8.3/fpm/php.ini
 
 date.timezone = America/Sao_Paulo
 ```
@@ -154,7 +155,7 @@ $db_name = "radius";
 
 ### reiniciar os serviços
 ```
-systemctl restart nginx php8.1-fpm
+systemctl restart nginx php8.3-fpm
 ```
 
 
