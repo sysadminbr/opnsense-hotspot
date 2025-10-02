@@ -1,12 +1,8 @@
 <?php
 session_start();
 
-if(empty($_SESSION['return_form'])){
-	$_SESSION['return_form'] = $_GET['targetOrigin'];
-}
-
-if($_SESSION['zone'] == null){
-	$_SESSION['zone'] = $_GET['zone'];
+if(empty($_SESSION['origin'])){
+        $_SESSION['origin'] = $_GET['origin'];
 }
 
 ?>
@@ -60,33 +56,36 @@ if($_SESSION['zone'] == null){
 
 <script>
 function sendForm(){
-        let login = document.getElementById("login").value;
-	let password = document.getElementById("password").value;
-	var x = new XMLHttpRequest();
-	x.open("POST", "<?=$_SESSION['return_form']?>/api/captiveportal/access/logon/"+<?=$_SESSION['zone'];?>+"/");
-	x.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	x.onloadend = (e)=>{
-		console.log(x.responseText);
-		let response = JSON.parse(x.responseText);
-		if(response["clientState"]=="AUTHORIZED"){
-			document.location.href="https://www.google.com/";
-		}else if(response["clientState"]=="NOT_AUTHORIZED"){
-			alert("usuario ou senha invalidos!");
-			document.querySelector("#password").value = "";
-		}
-	};
-	x.send("user="+login+"&password="+password);
+        $.ajax({
+        url: "<?=$_SESSION['origin']?>/api/captiveportal/access/logon/",
+        type: "POST",
+        dataType: "json",
+        data: {user: $("#login").val(), password: $("#password").val()}
+        }).done(function(data){
+        console.log(data);
+                if(data['clientState'] == "AUTHORIZED"){
+            console.log(data);
+                }else if(data["clientState"] == "NOT_AUTHORIZED"){
+                        alert("usuario ou senha invalidos!");
+                        document.querySelector("#password").value = "";
+                }else if(data["clientState"] == "UNKNOWN"){
+                        alert("usuario ou senha invalidos!");
+                        document.querySelector("#password").value = "";
+                }
+    });
 }
+
+
 document.addEventListener('DOMContentLoaded', ()=>{
         // usuario registrado?
-	<?php
-	if(!empty($_SESSION['registration']) && $_SESSION['registration'] == 'successful'){
-		unset($_SESSION['registration']);
-	?>
-		alert("Acesso registrado com sucesso! Você agora pode realizar o login.");
-	<?php
-	}
-	?>
+        <?php
+        if(!empty($_SESSION['registration']) && $_SESSION['registration'] == 'successful'){
+                unset($_SESSION['registration']);
+        ?>
+                alert("Acesso registrado com sucesso! Você agora pode realizar o login.");
+        <?php
+        }
+        ?>
 });
 </script>
 
@@ -104,7 +103,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
               <div class="container2">
                 <div class="container-logo">
                   <h1 style="color: #333" class="logo-vivo-em-dia d-none d-sm-none d-md-none d-lg-block">Portal Wi-Fi</h1>
-				  <h1 style="color: #fff" class="logo-vivo-em-dia d-block d-sm-block d-md-block d-lg-none">Portal Wi-Fi</h1>
+                                  <h1 style="color: #fff" class="logo-vivo-em-dia d-block d-sm-block d-md-block d-lg-none">Portal Wi-Fi</h1>
                   <div class="container-texto">Caso tenha cadastro, basta inserir seus dados. <br>
                     <br>Se ainda não tiver, clique em registrar-se.
                   </div>
@@ -135,7 +134,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
                       </div>
                       <div class="btnContinue">
                         <button class="btn" onclick="sendForm()" style="width: 100%;">Continuar</button>
-			<button class="btn" onclick="javascript:document.location.href='cadastro.php?zone=<?=$_SESSION['zone']?>'" style="width: 100%;margin-top:10px;">Registrar-se</button>
+                        <button class="btn" onclick="javascript:document.location.href='cadastro.php?origin=<?=$_SESSION['origin']?>'" style="width: 100%;margin-top:10px;">Registrar-se</button>
                       </div>
                     </div>
                   </div>
